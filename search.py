@@ -74,11 +74,13 @@ def main():
     parser.add_argument("query", type=str, help="Query to perform on the loaded documents")
     parser.add_argument("-l", "--limit", type=int, default=10, help="Number of results to return")
     parser.add_argument("-p", "--path", type=str, default="", help="Filter results by path containing this string")
+    parser.add_argument("-u", "--unique", action="store_true", help="Return only unique file paths")
     parser.add_argument("--collection", type=str, help="Specify a single collection to search in")
+    parser.add_argument("--ip-address", type=str, default="localhost", help="IP address of the Milvus server")
     args = parser.parse_args()
 
     start_time = datetime.now()
-    connections.connect("default", host='localhost', port='19530')
+    connections.connect("default", host=args.ip_address, port='19530')
     
     results = []
     try:
@@ -105,7 +107,7 @@ def main():
             query_vectors = embed_text_to_vector([args.query], model)
             validated_query_vectors = validate_embeddings(query_vectors, dim)
 
-            model_results = perform_search(collection, validated_query_vectors[0], args.limit)
+            model_results = perform_search(collection, validated_query_vectors[0], MAX_QUERY_LIMIT)
             logging.info(f"Number of results returned by search: {len(model_results)}")
             
             # Log the first result for debugging
@@ -129,6 +131,16 @@ def main():
             
             results.extend(filtered_results)
 
+        # Apply uniqueness filter if requested
+        if args.unique:
+            seen_paths = set()
+            unique_results = []
+            for result in results:
+                if result["path"] not in seen_paths:
+                    unique_results.append(result)
+                    seen_paths.add(result["path"])
+            results = unique_results
+        
         # Sort results by distance and limit to the requested number
         results = sorted(results, key=lambda x: x['distance'])[:args.limit]
         
