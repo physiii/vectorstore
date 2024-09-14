@@ -177,15 +177,6 @@ def ensure_collection_exists(collection_name, schema):
 
     return collection
 
-def clear_collection(collection_name):
-    from pymilvus import Collection, utility
-    if utility.has_collection(collection_name):
-        collection = Collection(name=collection_name)
-        collection.drop()
-        logging.info(f"Vector store {collection_name} cleared.")
-    else:
-        logging.info(f"Collection {collection_name} does not exist. Nothing to clear.")
-
 def delete_old_entries(collection, filepath):
     expr = f'path == "{filepath}"'
     collection.delete(expr)

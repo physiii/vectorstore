@@ -11,12 +11,21 @@ from utils import (
     DEFAULT_EMBEDDING_MODEL, EMBEDDING_DIMENSIONS, LOCAL_EMBEDDING_MODEL, LOCAL_EMBEDDING_DIM,
     SNIPPET_LENGTH, INDEX_TYPE, METRIC_TYPE, NLIST,
     embed_text_to_vector, validate_embeddings, count_files, load_files,
-    ensure_collection_exists, clear_collection, delete_old_entries, process_file, extract_snippet,
+    ensure_collection_exists, delete_old_entries, process_file, extract_snippet,
     file_hash, get_creation_date, process_and_insert_lines
 )
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
+
+def clear_collection(collection_name):
+    from pymilvus import Collection, utility
+    if utility.has_collection(collection_name):
+        collection = Collection(name=collection_name)
+        collection.drop()
+        logging.info(f"Vector store {collection_name} cleared.")
+    else:
+        logging.info(f"Collection {collection_name} does not exist. Nothing to clear.")
 
 def clear_vectorstore_collection(collection_name):
     connections.connect("default", host='localhost', port='19530')

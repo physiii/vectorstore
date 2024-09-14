@@ -10,7 +10,7 @@ def main():
     print("About to clear the collection...\n")
     clear_payload = {
         "type": "clear",
-        "collection": "amygdala"
+        "collection": "test"
     }
     response = requests.post(base_url, headers=headers, data=json.dumps(clear_payload))
     print(response.json())
@@ -20,7 +20,7 @@ def main():
     load_payload = {
         "type": "load",
         "text": "I am thirsty and want a drink of water",
-        "collection": "amygdala"
+        "collection": "test"
     }
     response = requests.post(base_url, headers=headers, data=json.dumps(load_payload))
     print(response.json())
@@ -30,7 +30,7 @@ def main():
     search_payload = {
         "type": "search",
         "query": "I want a drink",
-        "collection": "amygdala"
+        "collection": "test"
     }
     response = requests.post(base_url, headers=headers, data=json.dumps(search_payload))
     print(response.json())
